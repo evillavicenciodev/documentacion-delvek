@@ -1,0 +1,436 @@
+---
+title: Bienvenido a la Documentación
+description: safoih
+---
+import { FileTree } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+![Una ilustración de planetas y estrellas con la palabra “astro”](https://raw.githubusercontent.com/withastro/docs/main/public/default-og-image.png)
+
+Esta documentación contiene tanto la técnica como corporativa a continuacion veremos como es que podemos generar documentación a traves de esta herramienta denominada [Starlight](https://starlight.astro.build/es/) una técnologia de [Astro](https://astro.build/) ampliamente usada por empresas como Google, Microsoft, Porsche etc...
+
+
+## Sintaxis Markdown
+
+### ¿Que es Markdown?
+
+Es un lenguaje simple que se utiliza para crear texto enriquecido (por ejemplo, HTML) con un editor de texto sin formato. Te permite darle un formato básico al texto, utilizando símbolos conocidos y accesibles en todos los teclados.
+
+### Estructura del Proyecto
+
+Como podremos ver a continuación veremos la estructura del proyecto donde contamos con una carpeta `src` y dentro de dicha carpeta tenemos `docs` osea `./src/docs` dentro de la carpeta de `docs` es donde vamos a crear las carpetas que van a representar cada **sección** en la documentación, dentro de la carpeta que agreguemos cada archivo tiene que contar con el formato `.md` o `.mdx` por ejemplo `prueba.md` en archivo con dicho formato nos permitira crear texto enriquecido, util para generar nuestra documentación. 
+
+<FileTree>
+- ...
+- src
+  - docs
+    - demo Nombre de una sección de documentación
+      - **prueba.md** Archivo de documentación
+  - …
+
+</FileTree>
+
+### Agregar nueva documentación
+
+Supongamos que queremos agregar una nueva area a nuestra documentación, esta area se va a llamar `Cotizaciones` y dentro de esta area agregaremos tres sub-secciónes.
+
+<Steps>
+
+1. Crear una nueva carpeta dentro de la carpeta `docs` .
+
+   <FileTree>
+    - ...
+    - src
+      - docs
+        - **cotizaciones** Esta es la carpeta que agregamos
+      - …
+
+    </FileTree>
+
+2. Dentro de la carpeta de `Cotizaciones` agregamos los tres archivos que queremos agregar.
+    <FileTree>
+    - ...
+    - src
+      - docs
+        - cotizaciones
+          - **prueba.md** Este es un nuevo archivo
+          - **prueba2.md** Este es un nuevo archivo
+          - **prueba3.mdx** Este es un nuevo archivo
+      - …
+
+    </FileTree>
+
+3. Agregamos al archivo `astro.config.mjs` la nueva ruta. El valor de `label` es como se vera en nuestro menu osea podemos usar acentos o simbolos y `directory` es el nombre de la carpeta, osea que en nuestro menú veremos `Cotizaciones` y hara referencia a los archivos que se encuentran en la carpeta de `cotizaciones`. 
+
+    ```js ins={8,9,10,11}
+    //./astro.config.mjs
+    ...
+    sidebar: [
+            {
+              label: 'Prueba',
+              autogenerate: { directory: 'demo' },
+            },
+            {
+              label: 'Cotizaciones', // <= Nombre con acentos (NOMBRE DE MENÚ)
+              autogenerate: { directory: 'cotizaciones' }, // <= Ruta de la carpeta
+            },
+          ],
+    ...
+    ```
+4. Posteriormente tenemos que agregar a cada archivo que hayamos agregado, la siguiente convención obligatoriamente al inicio del documento para su correcto funcionamiento, de lo contrario no funcionara.
+    ```md {2,3,4,5}
+    //prueba.md
+    ---
+    title: Documentación de Cotizaciones //<= Este sera el nombre del menú
+    description: Esta es la documentación de cotizaciones
+    ---
+    ```
+</Steps>
+
+
+### Creación de Contenido
+
+Starlight admite la gama completa de la sintaxis Markdown en archivos .md, así como el frontmatter en YAML para definir metadatos como el título y la descripción.
+
+## Estilos en línea
+
+A continuación veras varios ejemplos.
+
+El texto puede estar **en negrita**, _en cursiva_, o ~~tachado~~.
+
+```md
+El texto puede estar **en negrita**, _en cursiva_, o ~~tachado~~.
+```
+
+Puedes [enlazar a otra página](https://www.google.com/).
+```md
+Puedes [enlazar a otra página](https://www.google.com/).
+```
+
+Puedes resaltar `código en línea` con comillas invertidas.
+```md
+Puedes resaltar `código en línea` con comillas invertidas.
+```
+
+## Frontmatter
+Puedes personalizar individualmente las páginas en Starlight estableciendo valores en el frontmatter. El frontmatter se establece en la parte superior de tus archivos entre separadores `--`.
+
+#### Ejemplo Frontmatter
+
+Tienes que generar un archivo con el formato `md` por ejemplo `prueba.md` este archivo tiene que ser creado unícamente y exlusivamente en la carpeta de `docs` dentro de la carpeta de `src`
+
+
+```md
+//src/content/docs/ejemplo.md
+---
+title: Mi título de página
+---
+
+El contenido de la página sigue luego de los `---`.
+```
+
+## ¿Como generar un nuevo archivo?
+
+A traves de cualquier editor de texto, puede ser el bloc de notas, word etc... Siempre y cuando los archivos finalicen con `.md` o `.mdx` de lo contrario no se podra generar la documentación. 
+
+```md
+//demo.md
+
+---
+title: Bienvenido a la Documentación
+description: safoih
+---
+
+![Una ilustración de planetas y estrellas con la palabra “astro”](https://raw.githubusercontent.com/withastro/docs/main/public/default-og-image.png)
+
+Esta documentación contiene tanto la técnica como corporativa a continuacion veremos como es que podemos generar documentación a traves de esta herramienta denominada [Starlight](https://starlight.astro.build/es/) una técnologia de [Astro](https://astro.build/) ampliamente usada por empresas como Google, Microsoft, Porsche etc...
+```
+
+## Imágenes
+Las imágenes en Starlight utilizan el soporte de assets optimizados incorporado en Astro.
+
+Markdown y MDX admiten la sintaxis Markdown para mostrar imágenes, que incluye alt-text para lectores de pantalla y tecnología de asistencia.
+
+![Una ilustración de un vehículo](https://images.unsplash.com/photo-1542228261-89eed3d81d98?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
+
+```md
+![Una ilustración de un vehículo](https://images.unsplash.com/photo-1542228261-89eed3d81d98?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
+```
+
+## Encabezados
+
+Puedes estructurar el contenido utilizando encabezados. Los encabezados en Markdown se indican con uno o más `#` al comienzo de la línea.
+
+### Cómo estructurar el contenido de la página
+
+Starlight está configurado para utilizar automáticamente el título de tu página como un encabezado de nivel superior y se incluirá un encabezado “Visión general” en la parte superior de la tabla de contenido de cada página. Recomendamos comenzar cada página con contenido de texto de párrafo regular y utilizar encabezados dentro de la página a partir de `<h2>` en adelante:
+
+```md
+---
+title: Guía de Markdown
+description: Cómo utilizar Markdown en Starlight
+---
+
+## Estilos en línea
+
+## Encabezados
+```
+
+### Enlaces de anclaje automáticos para encabezados.
+
+Al utilizar encabezados en Markdown, se generan automáticamente enlaces de anclaje para que puedas vincular directamente a ciertas secciones de tu página:
+
+```md
+---
+title: Mi página de contenido
+description: Cómo utilizar los enlaces de anclaje integrados de Starlight.
+---
+
+## Introducción
+
+Puedo enlazar a [mi conclusión](#conclusión) más abajo en la misma página.
+
+## Conclusión
+
+`https://mi-sitio.com/page1/#introduction` navega directamente a mi Introducción.
+```
+
+## Apartados
+
+Los apartados (también conocidos como “apartados” o ”contenido destacado”) son útiles para mostrar información secundaria junto al contenido principal de una página.
+
+Starlight proporciona una sintaxis personalizada de Markdown para renderizar apartados. Los bloques de apartados se indican utilizando un par de triples dos puntos `:::` para envolver tu contenido, y pueden ser de tipo `note`, `tip`, `caution` o `danger`.
+
+Puedes anidar cualquier otro tipo de contenido Markdown dentro de un apartado, pero los apartados son más adecuados para fragmentos de contenido cortos y concisos.
+
+### Nota de apartados
+:::note
+Este es el ejemplo de una nota
+:::
+
+```
+:::note
+Este es el ejemplo de una nota
+:::
+```
+
+### Títulos personalizados para los apartados
+Puedes especificar un título personalizado para el apartado utilizando corchetes cuadrados después del tipo del apartado, por ejemplo, `:::tip[¿Sabías esto?]`.
+
+:::tip[¿Sabías esto?]
+Astro te ayuda a construir sitios web más rápidos con la[“Arquitectura de Islas”](https://docs.astro.build/es/concepts/islands/).
+:::
+
+```md
+:::tip[¿Sabías esto?]
+Astro te ayuda a construir sitios web más rápidos con la[“Arquitectura de Islas”](https://docs.astro.build/es/concepts/islands/).
+:::
+```
+
+### Más tipos de apartados
+Los apartados de caution y danger son útiles para llamar la atención del usuario sobre detalles que podrían generar problemas. Si te encuentras utilizando estos tipos de apartados con frecuencia, también puede ser una señal de que lo que estás documentando podría beneficiarse de una reestructuración o rediseño.
+
+:::caution
+Si no estás seguro de si deseas un sitio de documentación increíble, piénsalo dos veces antes de usar [Starlight](/es/).
+:::
+
+:::danger
+Tus usuarios pueden ser más productivos y encontrar más fácil de usar tu producto gracias a las útiles características de Starlight.
+
+- Navegación clara
+- Tema de color configurable por el usuario
+- [Soporte de i18n](/es/guides/i18n/)
+
+:::
+
+```md
+:::caution
+Si no estás seguro de si deseas un sitio de documentación increíble, piénsalo dos veces antes de usar [Starlight](/es/).
+:::
+
+:::danger
+Tus usuarios pueden ser más productivos y encontrar más fácil de usar tu producto gracias a las útiles características de Starlight.
+
+- Navegación clara
+- Tema de color configurable por el usuario
+- [Soporte de i18n](/es/guides/i18n/)
+
+:::
+```
+
+## Citas en bloque
+
+> Esto es una cita en bloque, que se utiliza comúnmente para citar a otra persona o documento.
+
+> Las citas en bloque se indican con un `>` al inicio de cada línea.
+
+```md
+> Esto es una cita en bloque, que se utiliza comúnmente para citar a otra persona o documento.
+>
+> Las citas en bloque se indican con un `>` al inicio de cada línea.
+```
+
+## Bloques de código
+Un bloque de código se indica con un bloque de tres comillas invertidas ``` al inicio y al final. Puedes indicar el lenguaje de programación que se está utilizando después de las comillas invertidas de apertura.
+
+```csharp
+// Código de C# con resaltado de sintaxis.
+public interface IHojaInspeccionService
+{
+    Task<IEnumerable<AreaVehiculoDTO>> GetAllAreasAsync();
+    Task<IEnumerable<CheckListCatalogoDTO>> GetAllCheckListCatalogosAsync();
+}
+```
+
+```mdx
+
+  ```csharp
+        // Código de C# con resaltado de sintaxis.
+        public interface IHojaInspeccionService
+        {
+            Task<IEnumerable<AreaVehiculoDTO>> GetAllAreasAsync();
+            Task<IEnumerable<CheckListCatalogoDTO>> GetAllCheckListCatalogosAsync();
+        }
+  ``
+```
+
+### Características de Expressive Code
+
+Starlight usa Expressive Code para ampliar las posibilidades de formato de los bloques de código. Los marcadores de texto de Expressive Code y los plugins de marcos de ventana están habilitados de forma predeterminada. El renderizado de los bloques de código se puede configurar utilizando la opción de configuración expressiveCode de Starlight.
+
+
+#### Marcadores de texto
+
+Puedes resaltar líneas específicas o partes de tus bloques de código utilizando los marcadores de texto de Expressive Code en la línea de apertura de tu bloque de código. Usa llaves (`{ }`) para resaltar líneas enteras, y comillas para resaltar cadenas de texto.
+
+Hay tres estilos de resaltado: neutral para llamar la atención sobre el código, verde para indicar código insertado y rojo para indicar código eliminado. Tanto el texto como las líneas enteras pueden marcarse con el marcador predeterminado, o en combinación con `ins=` y `del=` para producir el resaltado deseado.
+
+#### Marca líneas enteras y rangos de líneas usando el marcador { }:
+
+```js {2-3}
+function demo() {
+  // Esta línea (#2) y la siguiente están resaltadas
+  return 'Esta es la línea #3 de este fragmento';
+}
+```
+
+```
+    ```js {2-3}
+    function demo() {
+      // Esta línea (#2) y la siguiente están resaltadas
+      return 'Esta es la línea #3 de este fragmento';
+    }
+    ```//Este es el formato para generar la sección de arriba
+```
+
+#### Marca selecciones de texto usando el marcador " " o expresiones regulares:
+
+```js "Términos individuales" /También.*compatibles/
+// Términos individuales también pueden ser resaltados
+function demo() {
+  return 'También las expresiones regulares son compatibles';
+}
+```
+
+```md
+```js "Términos individuales" /También.*compatibles/
+// Términos individuales también pueden ser resaltados
+function demo() {
+  return 'También las expresiones regulares son compatibles';
+}
+```//Este es el formato para generar la sección de arriba
+```
+
+#### Marca texto o líneas como insertadas o eliminadas con ins o del:
+
+```js "return true;" ins="insertados" del="eliminados"
+function demo() {
+  console.log('Estos son tipos de marcadores insertados y eliminados');
+  // La declaración de retorno utiliza el tipo de marcador predeterminado
+  return true;
+}
+```
+
+```md
+```js "return true;" ins="insertados" del="eliminados"
+function demo() {
+  console.log('Estos son tipos de marcadores insertados y eliminados');
+  // La declaración de retorno utiliza el tipo de marcador predeterminado
+  return true;
+}
+```//Este es el formato para generar la sección de arriba
+```
+
+#### Combina el resaltado de sintaxis con la sintaxis similar a diff:
+```diff lang="js"
+  function thisIsJavaScript() {
+    // ¡El bloque completo se resalta como JavaScript,
+    // y aún podemos añadir marcadores de diferencias a él!
+-   console.log('Código antiguo a eliminar')
++   console.log('¡Nuevo y brillante código!')
+  }
+```
+
+```md
+```diff lang="js"
+  function thisIsJavaScript() {
+    // ¡El bloque completo se resalta como JavaScript,
+    // y aún podemos añadir marcadores de diferencias a él!
+-   console.log('Código antiguo a eliminar')
++   console.log('¡Nuevo y brillante código!')
+  }
+```//Este es el formato para generar la sección de arriba
+```
+
+## Marcos y títulos
+
+Los bloques de código se pueden representar dentro de un marco similar a una ventana. Un marco que se parece a una ventana de código se utilizará para todos los demás lenguajes de programación (por ejemplo, `bash` o `sh`). Otros lenguajes se muestran dentro de un marco de estilo de editor de código si incluyen un título.
+
+Un título opcional del bloque de código se puede establecer con un atributo `title="..."` después de las comillas invertidas de apertura del bloque de código y el identificador del lenguaje, o con un comentario del nombre del archivo en las primeras líneas del código.
+
+### Añade una pestaña con el nombre del archivo con un comentario
+```js
+// mi-archivo-de-prueba.js
+console.log('¡Hola mundo!');
+```
+
+```md
+```js
+// mi-archivo-de-prueba.js
+console.log('¡Hola mundo!');
+```//Este formato genera la sección de arriba
+```
+
+### Agrega un título a la ventana Terminal
+```bash title="Instalando dependencias…"
+npm install
+```
+
+```md
+```bash title="Instalando dependencias…"
+npm install
+```//Este formato genera la sección de arriba
+```
+
+## Detalles
+Los details (también conocidos como “revelaciones” o “acordeones”) son útiles para ocultar contenido que no es inmediatamente relevante. Los usuarios pueden hacer clic en un breve resumen para expandir y ver el contenido completo.
+
+Usa el elemento HTML estándar `<details>` y `<summary>` en tu contenido Markdown para crear un widget de revelación.
+
+Puedes anidar cualquier otra sintaxis de Markdown dentro de un elemento `<details>`.
+
+<details>
+<summary>¿Dónde y cuándo es más visible la constelación de Andrómeda?</summary>
+
+La [constelación de Andrómeda](<https://es.wikipedia.org/wiki/Andr%C3%B3meda_(constelaci%C3%B3n)>) es más visible en el cielo nocturno durante el mes de noviembre en latitudes entre `+90°` y `−40°`.
+
+</details>
+
+```md
+<details>
+<summary>¿Dónde y cuándo es más visible la constelación de Andrómeda?</summary>
+
+La [constelación de Andrómeda](<https://es.wikipedia.org/wiki/Andr%C3%B3meda_(constelaci%C3%B3n)>) es más visible en el cielo nocturno durante el mes de noviembre en latitudes entre `+90°` y `−40°`.
+
+</details>
+```

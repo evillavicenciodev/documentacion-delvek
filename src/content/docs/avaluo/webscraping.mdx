@@ -1,0 +1,188 @@
+---
+title: WebScrapping  
+description: A continuacion veras la documentacion de como funciona el WebScrapping para obtener los datos de otros sitios web y almacenarlos en la evaluacion que es generada por el usuario
+---
+import { Steps } from '@astrojs/starlight/components';
+
+A continuacion veras la documentacion de como funciona el WebScrapping para obtener los datos de otros sitios web y almacenarlos en la evaluacion que es generada por el usuario
+
+## Dependencias
+
+### Puppeteer
+Usamos una tecnologia denominada **Puppeteer**, para más información puedes visitar su [Documentación](https://pptr.dev/category/introduction) o su correspondiente [Documentación](https://www.puppeteersharp.com/index.html) para C#.
+Esta tecnologia nos permite navegar a traves de la web a traves de un navegador virtual el cual va a visitar los sitios web que le indiquemos y extraer la información que le indiquemos.
+
+:::tip
+Puppeter funciona unicamente en JavaScript, debido a que el codigo que se ejecuta en el navegador es JavaScript por lo cual es obligatorio realizar este `Script` con dicho lenguaje.
+:::
+
+
+## C#
+
+### Pasos para aplicar Web Scrapping
+<Steps>
+1. Primero debemos realizar la instalación del paquete ejecutando el siguiente comando.
+     ```bash title="mi-proyecto"
+        dotnet add package PuppeteerSharp --version 18.0.4
+     ```
+2. Posteriormente importar nuestra dependencia de `PuppeteerSharp`
+
+        ```csharp
+        using PuppeteerSharp;
+        ```
+3. Una vez tenemos `PuppeteerSharp` en nuestro proyecto necesitamos la ruta a nuestro navegador y la dirección URL del sitio web donde queremos aplicar el `Web Scrapping`:
+        ```csharp
+        var url = $"https://www.kavak.com/mx/seminuevos/{marcaVehiculo}/{nombreVehiculo}/{anioVehiculo}";
+        string chrome = @"C:\Program Files\Google\Chrome\Application\chrome.exe";
+        ```
+4. Inicializamos `Puppeteer` de la siguiente manera, instanciando en las `LaunchOptiones` el `Headless = true` y en `ExecutablePath = chrome` la cual es la ruta de nuestro navegador que anteriormente instanciamos: 
+   ```csharp
+   await new BrowserFetcher().DownloadAsync();
+   var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true, ExecutablePath = chrome });
+   ```
+5. A traves del siguiente código es que indicamos que vamos a "Abrir una nueva pagina", todo esto se hace virtualmente por lo cual no se vera una nueva ventana del navegador, posteriormente la pasamos la `url` del sitio al que queremos ir, el `WaitUntilNavigation.Networkidle2` lo que indica es que vamos a esperar a que la página termine de cargar antes de que realicemos cualquier operación: 
+        ```csharp
+        var page = await browser.NewPageAsync();
+
+        await page.GoToAsync(url, WaitUntilNavigation.Networkidle2);
+        ```
+6. Aqui es donde comenzamos a aplicar la lógica para extraer los datos de la página, a traves del metodo `EvaluateFunctionAsync` es como indicamos que vamos a Evaluar la página, esta funcion recibe un string y este string es código de JavaScript, es obligatorio usar JavaScript ya que el motor del Navegador solamente entiende JavaScript, por lo cual a la fecha es imposible realizar esta accion sin JavaScript, para entender el funcionamiento del codigo en JavaScript da click [Aquí](#TypeScript):
+        ```csharp
+        var newProducts = await page.EvaluateFunctionAsync<CarDetails[]>(@"
+    () => {
+        const products = Array.from(document.querySelectorAll('.card-product'));
+        return products.map(product => {
+            const title = product.querySelector('.title')?.innerText;
+            const subtitle = product.querySelector('.subtitle')?.innerText;
+            const priceWhole = product.querySelector('.price')?.innerText;
+            const location = product.querySelector('.info')?.innerText;
+
+            if (!priceWhole) {
+                return null;
+            }
+
+            return {
+                Title: title,
+                Subtitle: subtitle,
+                PriceWhole: priceWhole,
+                Location: location
+            };
+        }).filter(product => product !== null);
+    }");
+        ```
+</Steps>
+
+
+## TypeScript
+
+### Formato de Interfaz
+Esta es la interfaz que la función debe de recibir para realizar la busqueda de la información
+
+```js
+//miarchivodeprueba.ts
+interface IVehiculo {
+    marcaVehiculo: string,
+    nombreVehiculo: string,
+    anioVehiculo: number,
+}
+
+const obtenerVehiculo = async (vehiculo: IVehiculo) => {...}
+```
+
+### Donde obtendremos los datos
+Necesitamos especificar la URL del sitio del cual obtendremos los datos.
+```js
+const URL = `https://www.kavak.com/mx/seminuevos/${vehiculo.marcaVehiculo}/${vehiculo.nombreVehiculo}`;
+```
+
+### Inicializacion de Puppeteer
+Se hace una instancia del browser a traves del metodo de puppeter, asi como tambien se genera una pagina y posteriormente se le pasa el URL anteriormente instanciado y como segundo argumento se le pasa un objeto el cual `{ waitUntil: 'networkidle2' }` le indica a puppeter que tiene que esperar a que termine de cargar la pagina.
+```js
+    const browser = await puppeteer.launch({
+        headless: true
+    });
+
+    const page = await browser.newPage();
+
+    await page.goto(URL, { waitUntil: 'networkidle2' });
+```
+
+### Logica para obtener datos
+Logíca para la extración de la información del sitio web indicado a traves de la URL. Realizamos instancias de las variables donde guardaremos los datos obtenidos, y por medio de un ciclo `while` es como aplicaremos nuestra logíca para cambiar de pagina (Si estamos en la página 1 entonces iremos a la página 2 y asi sucesivamente). 
+
+```js
+    let products: any[] = [];
+    let results = {};
+    let nextPage: boolean = true;
+    let pageNumber = 0;
+
+    while (nextPage) {...}
+```
+
+Dentro del ciclo `while` es donde nos encontramos con las siguientes funciones, las cuales nos permiten extraer la información.
+```js
+        const newProducts = await page.evaluate(() => {
+            const products = Array.from(document.querySelectorAll('.card-product'));
+
+            return products.map(product => {
+                const title: string = product.querySelector('.title')?.innerText;
+                const subtitle: string = product.querySelector('.subtitle')?.innerText;
+                const priceWhole: string = product.querySelector('.price')?.innerText;
+                const location: string = product.querySelector('.info')?.innerText;
+
+                if (!priceWhole) {
+                    return null;
+                }
+
+                return {
+                    title,
+                    subtitle,
+                    priceWhole,
+                    location
+                };
+            }).filter(product => product !== null);
+        });
+```
+En el bloque de código anteriormente mostrado, en la siguiente linea de código: `const products = Array.from(document.querySelectorAll('.card-product'));` es como seleccionamos todos los elementos HTML cuya clase sea `card-product`, por lo cual obtendremos toda la informacion que se encuentre dentro de ese Elemento de HTML.
+
+Para más información sobre la funcion de `querySelector` puede visitar la [Documentación](https://developer.mozilla.org/es/docs/Web/API/Document/querySelector) de Mozilla.
+
+```html
+<a _ngcontent-serverapp-c53="" rel="noopener" class="card-product" href="...">...</a>
+```
+
+Posteriormente a traves del siguiente código extraemos los valores que queremos de todos los Elementos de HTML que obtuvimos anteriormente, verificando que ninguna venga con un valor null:
+```js
+ products.map(product => {...}).filter(product => product !== null);
+```
+
+Dentro del mapeo aplicamos la siguiente logica donde a traves de `querySelector('.title')?.innerText` es como nosotros extraemos la información, le indicamos a JavaScript que vamos a seleccionar la informacion cuya clase sea `.title` haciendo referencia al siguiente elemento de HTML: 
+```html
+<h3 _ngcontent-serverapp-c53="" class="title">Audi • Q3</h3>
+```
+Cuyo resultado va a ser `Audi • Q3` ya que es el valor que se encontro dentro del elemento de HTML: 
+```js
+const title: string = product.querySelector('.title')?.innerText;
+
+console.log(title)
+//Esto mostrara por consola: "Audi • Q3"
+```
+Y asi es como obtenemos los datos con esta herramienta **Puppeteer**, es posible que en ciertos sitios web/aplicaciones web sea necesario usar proxys o algun metodo para eludir validaciones de bots o de web scrapping, ya que el sitio puede bloquear dicha accion.
+
+
+```js
+
+let results = [];
+
+const elementosVehiculos = document.querySelectorAll('.card-product');
+
+for(let i = 0; i < elementosVehiculos.length; i++){
+    results.push(elementosVehiculos[i].innerHTML)
+    
+    return elementosVehiculos;
+}
+
+
+const elementosVehiculos = 
+
+```
