@@ -1,0 +1,716 @@
+---
+title: Catalogos
+description: Comienza con la compresion de esta parte de la aplicacion, esta documentación te ayudara a generar catalogos a traves de una serie de pasos.
+hero:
+    tagline: Comienza con la compresión de esta parte de la aplicacion, donde explicaremos el funcionamiento de los componentes para Avaluo.
+---
+import { Steps } from '@astrojs/starlight/components';
+import { FileTree } from '@astrojs/starlight/components';
+
+## Generador de CRUD SENCILLO
+
+<Steps>
+1. INFORMACIÓN REQUERIDA
+       - Nombre de la Clase.
+       - Nombre del Área en la API
+       - Nombre del Área en el Front (Salvo algunas excepciones, será igual al Área de la API).
+       - Prefijo del controlador en la API (Texto que antecede a la palabra Controller).
+       - Prefijo del controlador en el Front (Salvo algunas excepciones, será igual al de la API).
+       - Descripción del CRUD en plural (Negocios, Países, Departamentos).
+       - Descripción del CRUD en singular (Negocio, País, Departamento).
+       - Nombre de variable foreach de la vista (Puede ser igual al prefijo del controlador, iniciando con minúscula, y en singular).
+       - Icono que representa al CRUD (ver iconos en la página de Bootstrap).
+       - Nombre del campo descriptivo dentro de la tabla (Descripcion, Nombre, etc.)
+       - Display del campo descriptivo dentro de la tabla, incluir acentos (Descripción.)
+       - Longitud del campo descriptivo dentro de la tabla.
+2. REEMPLAZAR PALABRAS.
+
+    ```csharp
+                    [ E J E M P L O ]
+    CLASSMODELO      - ComuCatRamas        - NOMBRE DE LA CLASE / MODELO
+    AREAAPI          - CatalogosComunes    - AREA API
+    AREAFRONT        - CatalogosComunes    - AREA FRONT
+    PREFCONTROLAPI   - Ramas               - PREFIJO CONTROLLER API - [Ramas]Controller
+    PREFCONTROLFRONT - Ramas               - PREFIJO CONTROLLER FRONT - [Ramas)Controller
+    DESCPLURAL       - Ramas               - DESCRIPCION PLURAL (CON ACENTOS)
+    DESCSINGULAR     - Rama                - DESCRIPCION SINGULAR (CON ACENTOS)
+    VARFOREACH       - rama                - VARIABLE MODEL foreach
+    ICONOCREAR       - bi bi-diagram-2     - ICONO EN BOTÓN CREAR
+    CAMPODESCRIP     - Descripcion         - CAMPO DESCRIPCION O NOMBRE (SIN ACENTOS)
+    DISPLAYCAMPODESC - Descripción         - DISPLAY DE CAMPO DESCRIPCION O NOMBRE (CON ACENTOS)
+    LONGDESCRIP      - 30                  - LONGITUD DEL CAMPO NOMBRE
+    ```
+3. REALIZAR ADECUACIONES A LA CLASE CLASSMODELO PARA QUE TENGA LOS MISMOS CAMPOS QUE LA TABLA, AGREGAR CAMPOS FALTANTES, ELIMINAR CAMPOS NO REQUERIDOS.
+    - CREAR LA CLASE `FrontGeisha/Areas/AREAFRONT/Models/CLASSMODELO.cs` Y COPIAR ESTE CÓDIGO.
+    ```csharp
+    //FrontGeisha/Areas/AREAFRONT/Models/CLASSMODELO.cs
+
+    using System.ComponentModel.DataAnnotations;
+
+    namespace FrontGeisha.Areas.AREAFRONT.Models
+    {
+        public class CLASSMODELO
+        {
+            public int Id { get; set; }
+            [Display(Name = "DISPLAYCAMPODESC")]
+            [Required(ErrorMessage = "El campo {0} es requerido")]
+            [StringLength(maximumLength: LONGDESCRIP)]
+            public string CAMPODESCRIP { get; set; }
+            public bool Estatus { get; set; }
+            public int IdUsuarioAlta { get; set; }
+            public int IdUsuarioBaja { get; set; }
+            public int IdUsuarioModif { get; set; }
+            public DateTime FechaAlta { get; set; }
+            public DateTime FechaBaja { get; set; }
+            public DateTime FechaUltModif { get; set; }
+        }
+    }
+
+    ```
+4. REALIZAR ADECUACIONES A LA CLASE CLASSMODELO PARA QUE TENGA LOS MISMOS CAMPOS QUE LA TABLA, AGREGAR CAMPOS FALTANTES, ELIMINAR CAMPOS NO REQUERIDOS. (COPIAR ESTRUCTURA DEL PUNTO ANTERIOR)
+
+    `CREAR LA CLASE ApiGeisha/Areas/AREAAPI/Models/CLASSMODELO.cs Y COPIAR ESTE CÓDIGO.`
+
+    ```csharp
+    //ApiGeisha/Areas/AREAAPI/Models/CLASSMODELO.cs
+    using System.ComponentModel.DataAnnotations;
+
+    namespace ApiGeisha.Areas.AREAAPI.Models
+    {
+        public class CLASSMODELO
+        {
+            public int Id { get; set; }
+            [Display(Name = "DISPLAYCAMPODESC")]
+            [Required(ErrorMessage = "El campo {0} es requerido")]
+            [StringLength(maximumLength: LONGDESCRIP)]
+            public string CAMPODESCRIP { get; set; }
+            public bool Estatus { get; set; }
+            public int IdUsuarioAlta { get; set; }
+            public int IdUsuarioBaja { get; set; }
+            public int IdUsuarioModif { get; set; }
+            public DateTime FechaAlta { get; set; }
+            public DateTime FechaBaja { get; set; }
+            public DateTime FechaUltModif { get; set; }
+        }
+    }
+    ```
+5. CREAR CLASE `FrontGeisha/Areas/AREAFRONT/Controllers/PREFCONTROLFRONTController.cs`
+   Y COPIAR ESTE CÓDIGO.
+
+   ```csharp
+   //FrontGeisha/Areas/AREAFRONT/Controllers/PREFCONTROLFRONTController.cs
+    using FrontGeisha.Areas.AREAFRONT.Models;
+    using FrontGeisha.Controllers;
+    using FrontGeisha.Services;
+    using Microsoft.AspNetCore.Mvc;
+
+    namespace FrontGeisha.Areas.AREAFRONT.Controllers
+    {
+        [Area("AREAFRONT")]
+        public class PREFCONTROLFRONTController : GenericoFrontController<CLASSMODELO>
+        {
+            /////////////////////////////////////////////////////////////////
+            // El método getRutaApi() debe ser sobreescrito por las clases //
+            // que heredan de GenericoFrontController para especificar la  //
+            // ruta del controlador, que en la API está definida como      //
+            // [Route("[area]/[controller]")].                             //
+            /////////////////////////////////////////////////////////////////
+            public override string getRutaApi()
+            {
+                return "AREAAPI/PREFCONTROLAPI";
+            }
+
+            public PREFCONTROLFRONTController(IServicioPeticionesHttp servicioPeticionesHttp) : base(servicioPeticionesHttp)
+            {
+            }
+        }
+
+    }
+   ```
+6. CREAR RUTA DONDE SE VAN A DEPOSITAR LAS VISTAS.
+   `FrontGeisha/Areas/AREAFRONT/views/PREFCONTROLFRONT`
+   <FileTree>
+     - ...
+     - Areas
+       - ...
+       - AREAFRONT
+         - views
+           - PREFCONTROLFRONT  CARPETA QUE TENEMOS QUE CREAR
+         - ...
+     - …
+
+    </FileTree>
+
+7. CREAR VISTA RAZOR VACÍA `FrontGeisha/Areas/AREAFRONT/views/PREFCONTROLFRONT/Index.cshtml`
+
+   ```csharp
+   //FrontGeisha/Areas/AREAFRONT/views/PREFCONTROLFRONT/Index.cshtml
+
+    @model IEnumerable<CLASSMODELO>
+
+    @inject IServicioSeguridad servicioSeguridad
+
+    @{
+        ViewData["Title"] = "DESCPLURAL";
+        bool AccesoCrear = await servicioSeguridad.Acceso(this.ViewContext.RouteData, "Crear");
+        bool AccesoEditar = await servicioSeguridad.Acceso(this.ViewContext.RouteData, "Editar");
+        bool AccesoBorrar = await servicioSeguridad.Acceso(this.ViewContext.RouteData, "Borrar");
+    }
+
+    <h1>DESCPLURAL</h1>
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @if (AccesoCrear)
+    {
+        <div class="mb-3">
+            <a asp-action="Crear" class="btn btn-primary" title="Crear DESCSINGULAR"><i class="ICONOCREAR me-2"></i>Crear DESCSINGULAR</a>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="my-scrollbar scroll-8">
+                <table id="tabla" class="table table-bordered table-hover table-striped">
+                    <thead class="encabezado encabezado-fijo">
+                        <tr>
+                            <th>Acciones</th>
+                            <th>DISPLAYCAMPODESC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var VARFOREACH in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="hidden" value="@VARFOREACH.Id" />
+                                    @if (AccesoEditar)
+                                    {
+                                        <a class="btn btn-primary" asp-action="Editar" asp-route-id="@VARFOREACH.Id" title="Editar"><i class="bi-pencil"></i></a>
+                                    }
+                                    @if (AccesoBorrar)
+                                    {
+                                        <button type="button" class="btn btn-danger" onclick="confirmaBorrar(this)" title="Borrar"><i class="bi-trash"></i></button>
+                                    }
+                                </td>
+                                <td>
+                                    @VARFOREACH.CAMPODESCRIP
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script src="~/js/utilidades.js" asp-append-version="true"></script>
+
+        <script>
+            function confirmaBorrar(boton) {
+
+                const renglon = $(boton).closest("TR");
+                const indice = renglon[0].rowIndex;
+                const tr = $("#tabla")[0].getElementsByTagName("tr");
+                const Id = parseInt(tr[indice].getElementsByTagName("input")[0].value);
+                const CAMPODESCRIP = $("td", renglon).eq(1).html().trim();
+
+                confirmarAccion({
+                    callBackAceptar: () => {
+                        borrarRegistro(Id, indice);
+                    },
+                    callbackCancelar: () => {
+
+                    },
+                    titulo: `¿Desea borrar ${CAMPODESCRIP}?`
+                })
+            }
+
+            async function borrarRegistro(Id, indice) {
+                const url = '@Url.Action("Borrar")/' + Id;
+                const respuesta = await fetch(url, {
+                    method: 'DELETE'
+                });
+
+                if (!respuesta.ok) {
+                    manejarErrorApi(respuesta);
+                    return;
+                }
+
+                $("#tabla")[0].deleteRow(indice);
+            }
+
+        </script>
+    }
+   ```
+8. CREAR VISTA RAZOR VACÍA `FrontGeisha/Areas/AREAFRONT/views/PREFCONTROLFRONT/Crear.cshtml` Y COPIAR ESTE CÓDIGO.
+
+    ```csharp
+    //FrontGeisha/Areas/AREAFRONT/views/PREFCONTROLFRONT/Crear.cshtml
+    @model CLASSMODELO
+
+    @{
+        ViewData["Title"] = "Crear DESCSINGULAR";
+    }
+
+    <h1>Crear DESCSINGULAR</h1>
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <form asp-action="Crear" autocomplete="off">
+        <div class="card">
+            <div class="card-body">
+                <div class="row my-4">
+                    <div class="col-12">
+                        <label asp-for="CAMPODESCRIP" class="form-label"></label>
+                        <input type="text" asp-for="CAMPODESCRIP" class="form-control" />
+                        <span asp-validation-for="CAMPODESCRIP" class="text-danger"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save2 me-2"></i>Crear</button>
+                <a class="btn btn-warning" asp-action="Index"><i class="bi bi-arrow-left me-2"></i>Volver</a>
+            </div>
+        </div>
+    </form>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+    ```
+
+9. CREAR VISTA RAZOR VACÍA `FrontGeisha/Areas/AREAFRONT/views/PREFCONTROLFRONT/Editar.cshtml` Y COPIAR ESTE CÓDIGO.
+    
+    ```csharp
+    //FrontGeisha/Areas/AREAFRONT/views/PREFCONTROLFRONT/Editar.cshtml
+    @model CLASSMODELO
+
+    @{
+        ViewData["Title"] = "Editar DESCSINGULAR";
+    }
+
+    <h1>Editar DESCSINGULAR</h1>
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <form asp-action="Editar" autocomplete="off">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row my-4">
+                    <div class="col-12">
+                        <label asp-for="CAMPODESCRIP" class="form-label"></label>
+                        <input type="text" asp-for="CAMPODESCRIP" class="form-control" />
+                        <span asp-validation-for="CAMPODESCRIP" class="text-danger"></span>
+                    </div>
+
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save2 me-2"></i>Actualizar</button>
+                <a class="btn btn-warning" asp-action="Index"><i class="bi bi-arrow-left me-2"></i>Volver</a>
+            </div>
+        </div>
+    </form>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+    ```
+10. CREAR CLASE `ApiGeisha/Areas/AREAAPI/Controllers/PREFCONTROLAPIController.cs` Y COPIAR ESTE CÓDIGO.
+    ```csharp
+    //ApiGeisha/Areas/AREAAPI/Controllers/PREFCONTROLAPIController.cs
+    using ApiGeisha.Areas.AREAAPI.Models;
+    using ApiGeisha.Controllers;
+    using ApiGeisha.Services;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+
+    namespace ApiGeisha.Areas.AREAAPI.Controllers
+    {
+        [ApiController]
+        [Area("AREAAPI")]
+        [Route("[area]/[controller]")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public class PREFCONTROLAPIController : GenericoApiController<CLASSMODELO>
+        {
+            public PREFCONTROLAPIController(IRepositorioGenerico<CLASSMODELO> repositorioGenerico) : base(repositorioGenerico)
+            {
+            }
+        }
+    }
+    ```
+11. AGREGAR SERVICIO EN ApiGeisha/Startup.cs PARA HABILITAR EL USO DEL REPOSITORIO
+    GENERICO DE LA ENTIDAD CLASSMODELO
+
+    ```csharp
+    //ApiGeisha/Startup.cs
+    //SI ES BASE DE DATOS GrupoGeisha
+    services.AddTransient<IRepositorioGenerico<CLASSMODELO>, RepositorioGenericoGrupo<CLASSMODELO>>();
+
+    //SI ES BASE DE DATOS DEL NEGOCIO - TOQUE, KIQUE, REQUE, NICUI, ETC.
+    services.AddTransient<IRepositorioGenerico<CLASSMODELO>, RepositorioGenericoNegocio<CLASSMODELO>>();
+    ```
+</Steps>
+
+## Código para generar CRUD sencillo
+
+```csharp
+1) INFORMACIÓN REQUERIDA:
+
+ - Nombre de la Clase.
+ - Nombre del Área en la API
+ - Nombre del Área en el Front (Salvo algunas excepciones, será igual al Área de la API).
+ - Prefijo del controlador en la API (Texto que antecede a la palabra Controller).
+ - Prefijo del controlador en el Front (Salvo algunas excepciones, será igual al de la API).
+ - Descripción del CRUD en plural (Negocios, Países, Departamentos).
+ - Descripción del CRUD en singular (Negocio, País, Departamento).
+ - Nombre de variable foreach de la vista (Puede ser igual al prefijo del controlador, iniciando con minúscula, y en singular).
+ - Icono que representa al CRUD (ver iconos en la página de Bootstrap).
+ - Nombre del campo descriptivo dentro de la tabla (Descripcion, Nombre, etc.)
+ - Display del campo descriptivo dentro de la tabla, incluir acentos (Descripción.)
+ - Longitud del campo descriptivo dentro de la tabla.
+
+===================================================================================================
+2) REEMPLAZAR PALABRAS.
+
+                   [ E J E M P L O ]
+CLASSMODELO      - ComuCatRamas        - NOMBRE DE LA CLASE / MODELO
+AREAAPI          - CatalogosComunes    - AREA API
+AREAFRONT        - CatalogosComunes    - AREA FRONT
+PREFCONTROLAPI   - Ramas               - PREFIJO CONTROLLER API - [Ramas]Controller
+PREFCONTROLFRONT - Ramas               - PREFIJO CONTROLLER FRONT - [Ramas)Controller
+DESCPLURAL       - Ramas               - DESCRIPCION PLURAL (CON ACENTOS)
+DESCSINGULAR     - Rama                - DESCRIPCION SINGULAR (CON ACENTOS)
+VARFOREACH       - rama                - VARIABLE MODEL foreach
+ICONOCREAR       - bi bi-diagram-2     - ICONO EN BOTÓN CREAR
+CAMPODESCRIP     - Descripcion         - CAMPO DESCRIPCION O NOMBRE (SIN ACENTOS)
+DISPLAYCAMPODESC - Descripción         - DISPLAY DE CAMPO DESCRIPCION O NOMBRE (CON ACENTOS)
+LONGDESCRIP      - 30                  - LONGITUD DEL CAMPO NOMBRE
+
+
+==== Model CLASSMODELO FRONT ======================================================================
+
+3) REALIZAR ADECUACIONES A LA CLASE CLASSMODELO PARA QUE TENGA LOS MISMOS CAMPOS QUE LA TABLA, 
+   AGREGAR CAMPOS FALTANTES, ELIMINAR CAMPOS NO REQUERIDOS.
+   
+   CREAR LA CLASE FrontGeisha/Areas/AREAFRONT/Models/CLASSMODELO.cs Y COPIAR ESTE CÓDIGO.
+
+
+using System.ComponentModel.DataAnnotations;
+
+namespace FrontGeisha.Areas.AREAFRONT.Models
+{
+    public class CLASSMODELO
+    {
+        public int Id { get; set; }
+        [Display(Name = "DISPLAYCAMPODESC")]
+        [Required(ErrorMessage = "El campo {0} es requerido")]
+        [StringLength(maximumLength: LONGDESCRIP)]
+        public string CAMPODESCRIP { get; set; }
+        public bool Estatus { get; set; }
+        public int IdUsuarioAlta { get; set; }
+        public int IdUsuarioBaja { get; set; }
+        public int IdUsuarioModif { get; set; }
+        public DateTime FechaAlta { get; set; }
+        public DateTime FechaBaja { get; set; }
+        public DateTime FechaUltModif { get; set; }
+    }
+}
+
+==== Model CLASSMODELO API ========================================================================
+ 
+4) REALIZAR ADECUACIONES A LA CLASE CLASSMODELO PARA QUE TENGA LOS MISMOS CAMPOS QUE LA TABLA, 
+   AGREGAR CAMPOS FALTANTES, ELIMINAR CAMPOS NO REQUERIDOS.
+   (COPIAR ESTRUCTURA DEL PUNTO ANTERIOR)
+   
+   CREAR LA CLASE ApiGeisha/Areas/AREAAPI/Models/CLASSMODELO.cs Y COPIAR ESTE CÓDIGO.
+
+
+using System.ComponentModel.DataAnnotations;
+
+namespace ApiGeisha.Areas.AREAAPI.Models
+{
+    public class CLASSMODELO
+    {
+        public int Id { get; set; }
+        [Display(Name = "DISPLAYCAMPODESC")]
+        [Required(ErrorMessage = "El campo {0} es requerido")]
+        [StringLength(maximumLength: LONGDESCRIP)]
+        public string CAMPODESCRIP { get; set; }
+        public bool Estatus { get; set; }
+        public int IdUsuarioAlta { get; set; }
+        public int IdUsuarioBaja { get; set; }
+        public int IdUsuarioModif { get; set; }
+        public DateTime FechaAlta { get; set; }
+        public DateTime FechaBaja { get; set; }
+        public DateTime FechaUltModif { get; set; }
+    }
+}
+
+==== PREFCONTROLFRONTController Front =============================================================
+
+5) CREAR CLASE FrontGeisha/Areas/AREAFRONT/Controllers/PREFCONTROLFRONTController.cs
+   Y COPIAR ESTE CÓDIGO.
+
+using FrontGeisha.Areas.AREAFRONT.Models;
+using FrontGeisha.Controllers;
+using FrontGeisha.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace FrontGeisha.Areas.AREAFRONT.Controllers
+{
+    [Area("AREAFRONT")]
+    public class PREFCONTROLFRONTController : GenericoFrontController<CLASSMODELO>
+    {
+        /////////////////////////////////////////////////////////////////
+        // El método getRutaApi() debe ser sobreescrito por las clases //
+        // que heredan de GenericoFrontController para especificar la  //
+        // ruta del controlador, que en la API está definida como      //
+        // [Route("[area]/[controller]")].                             //
+        /////////////////////////////////////////////////////////////////
+        public override string getRutaApi()
+        {
+            return "AREAAPI/PREFCONTROLAPI";
+        }
+
+        public PREFCONTROLFRONTController(IServicioPeticionesHttp servicioPeticionesHttp) : base(servicioPeticionesHttp)
+        {
+        }
+    }
+
+}
+
+==== Crear ruta views PREFCONTROLFRONT ============================================================
+
+6) CREAR RUTA DONDE SE VAN A DEPOSITAR LAS VISTAS.
+
+FrontGeisha/Areas/AREAFRONT/views/PREFCONTROLFRONT
+
+
+==== Index.cshtml =================================================================================
+
+7) CREAR VISTA RAZOR VACÍA FrontGeisha/Areas/AREAFRONT/views/PREFCONTROLFRONT/Index.cshtml
+   Y COPIAR ESTE CÓDIGO.
+
+
+@model IEnumerable<CLASSMODELO>
+
+@inject IServicioSeguridad servicioSeguridad
+
+@{
+    ViewData["Title"] = "DESCPLURAL";
+    bool AccesoCrear = await servicioSeguridad.Acceso(this.ViewContext.RouteData, "Crear");
+    bool AccesoEditar = await servicioSeguridad.Acceso(this.ViewContext.RouteData, "Editar");
+    bool AccesoBorrar = await servicioSeguridad.Acceso(this.ViewContext.RouteData, "Borrar");
+}
+
+<h1>DESCPLURAL</h1>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@if (AccesoCrear)
+{
+    <div class="mb-3">
+        <a asp-action="Crear" class="btn btn-primary" title="Crear DESCSINGULAR"><i class="ICONOCREAR me-2"></i>Crear DESCSINGULAR</a>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+
+        <div class="my-scrollbar scroll-8">
+            <table id="tabla" class="table table-bordered table-hover table-striped">
+                <thead class="encabezado encabezado-fijo">
+                    <tr>
+                        <th>Acciones</th>
+                        <th>DISPLAYCAMPODESC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var VARFOREACH in Model)
+                    {
+                        <tr>
+                            <td>
+                                <input type="hidden" value="@VARFOREACH.Id" />
+                                @if (AccesoEditar)
+                                {
+                                    <a class="btn btn-primary" asp-action="Editar" asp-route-id="@VARFOREACH.Id" title="Editar"><i class="bi-pencil"></i></a>
+                                }
+                                @if (AccesoBorrar)
+                                {
+                                    <button type="button" class="btn btn-danger" onclick="confirmaBorrar(this)" title="Borrar"><i class="bi-trash"></i></button>
+                                }
+                            </td>
+                            <td>
+                                @VARFOREACH.CAMPODESCRIP
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/utilidades.js" asp-append-version="true"></script>
+
+    <script>
+        function confirmaBorrar(boton) {
+
+            const renglon = $(boton).closest("TR");
+            const indice = renglon[0].rowIndex;
+            const tr = $("#tabla")[0].getElementsByTagName("tr");
+            const Id = parseInt(tr[indice].getElementsByTagName("input")[0].value);
+            const CAMPODESCRIP = $("td", renglon).eq(1).html().trim();
+
+            confirmarAccion({
+                callBackAceptar: () => {
+                    borrarRegistro(Id, indice);
+                },
+                callbackCancelar: () => {
+
+                },
+                titulo: `¿Desea borrar ${CAMPODESCRIP}?`
+            })
+        }
+
+        async function borrarRegistro(Id, indice) {
+            const url = '@Url.Action("Borrar")/' + Id;
+            const respuesta = await fetch(url, {
+                method: 'DELETE'
+            });
+
+            if (!respuesta.ok) {
+                manejarErrorApi(respuesta);
+                return;
+            }
+
+            $("#tabla")[0].deleteRow(indice);
+        }
+
+    </script>
+}
+
+==== Crear.cshtml =================================================================================
+
+8) CREAR VISTA RAZOR VACÍA FrontGeisha/Areas/AREAFRONT/views/PREFCONTROLFRONT/Crear.cshtml
+   Y COPIAR ESTE CÓDIGO.
+
+
+@model CLASSMODELO
+
+@{
+    ViewData["Title"] = "Crear DESCSINGULAR";
+}
+
+<h1>Crear DESCSINGULAR</h1>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-action="Crear" autocomplete="off">
+    <div class="card">
+        <div class="card-body">
+            <div class="row my-4">
+                <div class="col-12">
+                    <label asp-for="CAMPODESCRIP" class="form-label"></label>
+                    <input type="text" asp-for="CAMPODESCRIP" class="form-control" />
+                    <span asp-validation-for="CAMPODESCRIP" class="text-danger"></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-save2 me-2"></i>Crear</button>
+            <a class="btn btn-warning" asp-action="Index"><i class="bi bi-arrow-left me-2"></i>Volver</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+
+==== Editar.cshtml ================================================================================
+
+9) CREAR VISTA RAZOR VACÍA FrontGeisha/Areas/AREAFRONT/views/PREFCONTROLFRONT/Editar.cshtml
+   Y COPIAR ESTE CÓDIGO.
+
+
+@model CLASSMODELO
+
+@{
+    ViewData["Title"] = "Editar DESCSINGULAR";
+}
+
+<h1>Editar DESCSINGULAR</h1>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-action="Editar" autocomplete="off">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row my-4">
+                <div class="col-12">
+                    <label asp-for="CAMPODESCRIP" class="form-label"></label>
+                    <input type="text" asp-for="CAMPODESCRIP" class="form-control" />
+                    <span asp-validation-for="CAMPODESCRIP" class="text-danger"></span>
+                </div>
+
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-save2 me-2"></i>Actualizar</button>
+            <a class="btn btn-warning" asp-action="Index"><i class="bi bi-arrow-left me-2"></i>Volver</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+==== PREFCONTROLAPIController Api ===========================================================
+
+10) CREAR CLASE ApiGeisha/Areas/AREAAPI/Controllers/PREFCONTROLAPIController.cs
+   Y COPIAR ESTE CÓDIGO.
+
+
+using ApiGeisha.Areas.AREAAPI.Models;
+using ApiGeisha.Controllers;
+using ApiGeisha.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ApiGeisha.Areas.AREAAPI.Controllers
+{
+    [ApiController]
+    [Area("AREAAPI")]
+    [Route("[area]/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public class PREFCONTROLAPIController : GenericoApiController<CLASSMODELO>
+    {
+        public PREFCONTROLAPIController(IRepositorioGenerico<CLASSMODELO> repositorioGenerico) : base(repositorioGenerico)
+        {
+        }
+    }
+}
+
+
+==== Startup.cs Api ============================================================
+
+11) AGREGAR SERVICIO EN ApiGeisha/Startup.cs PARA HABILITAR EL USO DEL REPOSITORIO
+    GENERICO DE LA ENTIDAD CLASSMODELO
+
+SI ES BASE DE DATOS GrupoGeisha
+services.AddTransient<IRepositorioGenerico<CLASSMODELO>, RepositorioGenericoGrupo<CLASSMODELO>>();
+
+SI ES BASE DE DATOS DEL NEGOCIO - TOQUE, KIQUE, REQUE, NICUI, ETC.
+services.AddTransient<IRepositorioGenerico<CLASSMODELO>, RepositorioGenericoNegocio<CLASSMODELO>>();
+
+
+```
+
