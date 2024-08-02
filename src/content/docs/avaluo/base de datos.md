@@ -153,8 +153,8 @@ CREATE INDEX IX_AvalInspeccion_Estatus ON AvalInspeccion(estatus);
 
 CREATE TABLE AvalGuiaPrecio (
     Id INT PRIMARY KEY IDENTITY (1,1),
-    IdInspeccion INT NOT NULL,
-    IdClasificacionGuiaPrecio INT NOT NULL,
+    IdAvalInspeccion INT NOT NULL,
+    IdAvalClasificacionGuiaPrecio INT NOT NULL,
     Precio DECIMAL(18, 2) NOT NULL,
     IdUsuarioAlta INT NOT NULL,
     IdUsuarioBaja INT,
@@ -162,8 +162,8 @@ CREATE TABLE AvalGuiaPrecio (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (IdInspeccion) REFERENCES AvalInspeccion(id),
-    FOREIGN KEY (IdClasificacionGuiaPrecio) REFERENCES AvalClasificacionGuiaPrecio(id)
+    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id),
+    FOREIGN KEY (IdAvalClasificacionGuiaPrecio) REFERENCES AvalClasificacionGuiaPrecio(id)
 );
 
 
