@@ -102,7 +102,6 @@ CREATE TABLE AvalClasificacionGuiaPrecio (
 );
 
 CREATE TABLE AvalClasificacionClass (
-
     id INT PRIMARY KEY IDENTITY(1,1),
     IdAvalClasificacionGuiaPrecio INT NOT NULL,
     classQuery NVARCHAR(MAX) NOT NULL,
@@ -114,7 +113,8 @@ CREATE TABLE AvalClasificacionClass (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (IdAvalClasificacionGuiaPrecio) REFERENCES AvalClasificacionGuiaPrecio(id)
+    CONSTRAINT FK_AvalClasificacionClass_AvalClasificacionGuiaPrecio_IdAvalClasificacionGuiaPrecio 
+    FOREIGN KEY (IdAvalClasificacionGuiaPrecio) REFERENCES AvalClasificacionGuiaPrecio(id) ON DELETE CASCADE
 );
 
 INSERT INTO AvalClasificacionGuiaPrecio (nombre, IdUsuarioAlta) VALUES ('GUIA AUTOMETRICA', 1), ('MERCADOLIBRE', 1), ('KAVAK',1);
@@ -162,17 +162,18 @@ CREATE TABLE AvalGuiaPrecio (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id),
-    FOREIGN KEY (IdAvalClasificacionGuiaPrecio) REFERENCES AvalClasificacionGuiaPrecio(id)
+    CONSTRAINT FK_AvalGuiaPrecio_AvalInspeccion_IdAvalInspeccion 
+    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id) ON DELETE CASCADE,
+    CONSTRAINT FK_AvalGuiaPrecio_AvalClasificacionGuiaPrecio_IdAvalClasificacionGuiaPrecio 
+    FOREIGN KEY (IdAvalClasificacionGuiaPrecio) REFERENCES AvalClasificacionGuiaPrecio(id) ON DELETE CASCADE
 );
+
 
 
 CREATE TABLE AvalImageInspeccion (
     id Int PRIMARY KEY IDENTITY(1,1),
     IdAvalInspeccion INT NOT NULL,
-
     image VARBINARY(MAX),
-
     estatus BIT DEFAULT 1,
     IdUsuarioAlta INT NOT NULL,
     IdUsuarioBaja INT,
@@ -180,9 +181,8 @@ CREATE TABLE AvalImageInspeccion (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
-
-    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id)
-
+    CONSTRAINT FK_AvalImageInspeccion_AvalInspeccion_IdAvalInspeccion 
+    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id) ON DELETE CASCADE
 );
 -- Índice recomendado
 CREATE INDEX IX_AvalImagesAvalInspeccion_IdAvalInspeccion ON AvalImageInspeccion(IdAvalInspeccion);
@@ -210,7 +210,6 @@ CREATE TABLE AvalFirmaUsuario (
     IdAvalInspeccion INT NOT NULL,
     IdAvalClasificacionFirmas INT NOT NULL,
     firmaUsuario VARBINARY(MAX),
-
     estatus BIT DEFAULT 1,
     IdUsuarioAlta INT NOT NULL,
     IdUsuarioBaja INT,
@@ -218,9 +217,10 @@ CREATE TABLE AvalFirmaUsuario (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
-
-    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id),
-    FOREIGN KEY (IdAvalClasificacionFirmas) REFERENCES AvalClasificacionFirmas(id)
+    CONSTRAINT FK_AvalFirmaUsuario_AvalInspeccion_IdAvalInspeccion 
+    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id) ON DELETE CASCADE,
+    CONSTRAINT FK_AvalFirmaUsuario_AvalClasificacionFirmas_IdAvalClasificacionFirmas 
+    FOREIGN KEY (IdAvalClasificacionFirmas) REFERENCES AvalClasificacionFirmas(id) ON DELETE CASCADE
 );
 -- Índices recomendados
 CREATE INDEX IX_AvalFirmaUsuario_IdAvalInspeccion ON AvalFirmaUsuario(IdAvalInspeccion);
@@ -254,8 +254,11 @@ CREATE TABLE AvalVehiculo (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_AvalVehiculo_AvalInspeccion_IdAvalInspeccion
     FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id),
+    CONSTRAINT FK_AvalVehiculo_AvalInteriorVehiculo_IdAvalInteriorVehiculo
     FOREIGN KEY (IdAvalInteriorVehiculo) REFERENCES AvalInteriorVehiculo(id),
+    CONSTRAINT FK_AvalVehiculo_AvalCombustible_IdCombustible
     FOREIGN KEY (IdCombustible) REFERENCES AvalCombustible(id)
 );
 -- Índices recomendados
@@ -280,7 +283,9 @@ CREATE TABLE AvalLlantasVehiculo (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_AvalLlantasVehiculo_AvalVehiculo_IdAvalVehiculo
     FOREIGN KEY (IdAvalVehiculo) REFERENCES AvalVehiculo(id),
+    CONSTRAINT FK_AvalLlantasVehiculo_AvalClasificacionUbicacionLlanta_IdAvalClasificacionUbicacionLlanta
     FOREIGN KEY (IdAvalClasificacionUbicacionLlanta) REFERENCES AvalClasificacionUbicacionLlanta(id)
 );
 -- Índices recomendados para AvalLlantasVehiculo
@@ -315,8 +320,10 @@ CREATE TABLE AvalCheckListItem (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id),
-    FOREIGN KEY (IdAvalCheckListCatalogo) REFERENCES AvalCheckListCatalogo(id)
+    CONSTRAINT FK_AvalCheckListItem_AvalInspeccion_IdAvalInspeccion 
+    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id) ON DELETE CASCADE,
+    CONSTRAINT FK_AvalCheckListItem_AvalCheckListCatalogo_IdAvalCheckListCatalogo 
+    FOREIGN KEY (IdAvalCheckListCatalogo) REFERENCES AvalCheckListCatalogo(id) ON DELETE CASCADE
 );
 -- Índices recomendados para AvalCheckListItem
 CREATE INDEX IX_AvalCheckListItem_IdAvalInspeccion ON AvalCheckListItem(IdAvalInspeccion);
@@ -338,8 +345,10 @@ CREATE TABLE AvalCoordenadas (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id),
-    FOREIGN KEY (IdAvalClasificacionAfectacionVehiculo) REFERENCES AvalClasificacionAfectacionVehiculo(id)
+    CONSTRAINT FK_AvalCoordenadas_AvalInspeccion_IdAvalInspeccion 
+    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id) ON DELETE CASCADE,
+    CONSTRAINT FK_AvalCoordenadas_AvalClasificacionAfectacionVehiculo_IdAvalClasificacionAfectacionVehiculo 
+    FOREIGN KEY (IdAvalClasificacionAfectacionVehiculo) REFERENCES AvalClasificacionAfectacionVehiculo(id) ON DELETE CASCADE
 );
 -- Índices recomendados para AvalCoordenadas
 CREATE INDEX IX_AvalCoordenadas_IdAvalInspeccion ON AvalCoordenadas(IdAvalInspeccion);
@@ -373,7 +382,8 @@ CREATE TABLE AvalElementoVehiculo (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (IdAvalAreaVehiculo) REFERENCES AvalAreaVehiculo(id)
+    CONSTRAINT FK_AvalElementoVehiculo_AvalAreaVehiculo_IdAvalAreaVehiculo 
+    FOREIGN KEY (IdAvalAreaVehiculo) REFERENCES AvalAreaVehiculo(id) ON DELETE CASCADE
 );
 -- Índices recomendados para AvalElementoVehiculo
 CREATE INDEX IX_AvalElementoVehiculo_IdAvalAreaVehiculo ON AvalElementoVehiculo(IdAvalAreaVehiculo);
@@ -395,10 +405,14 @@ CREATE TABLE AvalCondicionVehiculo (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id),
-    FOREIGN KEY (IdPresentacionGeneral) REFERENCES AvalClasificacionCondicionVehiculo(id),
-    FOREIGN KEY (IdEstadoMecanicoGeneral) REFERENCES AvalClasificacionCondicionVehiculo(id)
+    CONSTRAINT FK_AvalCondicionVehiculo_AvalInspeccion_IdAvalInspeccion 
+    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id) ON DELETE CASCADE,
+    CONSTRAINT FK_AvalCondicionVehiculo_AvalClasificacionCondicionVehiculo_IdPresentacionGeneral 
+    FOREIGN KEY (IdPresentacionGeneral) REFERENCES AvalClasificacionCondicionVehiculo(id) ON DELETE NO ACTION,
+    CONSTRAINT FK_AvalCondicionVehiculo_AvalClasificacionCondicionVehiculo_IdEstadoMecanicoGeneral 
+    FOREIGN KEY (IdEstadoMecanicoGeneral) REFERENCES AvalClasificacionCondicionVehiculo(id) ON DELETE NO ACTION
 );
+
 -- Índices recomendados
 CREATE INDEX IX_AvalCondicionVehiculo_IdAvalInspeccion ON AvalCondicionVehiculo(IdAvalInspeccion);
 CREATE INDEX IX_AvalCondicionVehiculo_IdPresentacionGeneral ON AvalCondicionVehiculo(IdPresentacionGeneral);
@@ -419,9 +433,13 @@ CREATE TABLE AvalCondicionElementoVehiculo (
     FechaAlta DATETIME DEFAULT GETDATE(),
     FechaBaja DATETIME,
     FechaUltModif DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id),
-    FOREIGN KEY (IdAvalElementoVehiculo) REFERENCES AvalElementoVehiculo(id),
-    FOREIGN KEY (IdAvalClasificacionCondicionVehiculo) REFERENCES AvalClasificacionCondicionVehiculo(id)
+    CONSTRAINT FK_AvalCondicionElementoVehiculo_AvalInspeccion_IdAvalInspeccion 
+    FOREIGN KEY (IdAvalInspeccion) REFERENCES AvalInspeccion(id) ON DELETE CASCADE,
+    CONSTRAINT FK_AvalCondicionElementoVehiculo_AvalElementoVehiculo_IdAvalElementoVehiculo 
+    FOREIGN KEY (IdAvalElementoVehiculo) REFERENCES AvalElementoVehiculo(id) ON DELETE CASCADE,
+    CONSTRAINT FK_AvalCondicionElementoVehiculo_AvalClasificacionCondicionVehiculo_IdAvalClasificacionCondicionVehiculo 
+    FOREIGN KEY (IdAvalClasificacionCondicionVehiculo) REFERENCES AvalClasificacionCondicionVehiculo(id) ON DELETE CASCADE
+
 );
 -- Índices recomendados
 CREATE INDEX IX_AvalCondicionElementoVehiculo_IdAvalInspeccion ON AvalCondicionElementoVehiculo(IdAvalInspeccion);
